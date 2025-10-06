@@ -1,0 +1,47 @@
+{{>partial_header}}
+using System.ComponentModel;
+using ModelContextProtocol.Server;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using {{sourceFolder}}.{{packageName}}.Model;
+{{^isLibrary}}using UnityEngine;
+{{/isLibrary}}
+
+namespace {{sourceFolder}}.{{packageName}}.{{#isLibrary}}Interface{{/isLibrary}}{{^isLibrary}}Mcp{{/isLibrary}}
+{
+    {{#operations}}
+    {{#isLibrary}}/// <remarks>
+    /// Place [McpServerToolType] on your derived class. 
+    /// </remarks>{{/isLibrary}}{{^isLibrary}}[McpServerToolType]{{/isLibrary}}
+    {{>visibility}} {{#isLibrary}}abstract {{/isLibrary}}class {{baseName}}McpTool{{#isLibrary}}Base{{/isLibrary}}
+    {
+        {{#operation}}
+        /// <summary>
+        /// {{summary}}
+        /// </summary>
+        {{#notes}}
+        /// <remarks>
+        /// {{#isLibrary}}{{#returnType}}string response = null;
+        /// {{#examples}}response = "{{{example}}}";
+        /// {{/examples}}{{/returnType}}Debug.Log($"[MCP] {{summary}} response: {response}");
+        /// return {{#returnType}}response{{/returnType}}{{^returnType}}"OK"{{/returnType}};{{/isLibrary}}{{^isLibrary}}{{.}}{{/isLibrary}}
+        /// </remarks>
+        {{/notes}}
+        /// <returns>{{returnType}} JSON</returns>
+        [McpServerTool, Description("{{{notes}}}")]
+        public {{#isLibrary}}abstract {{/isLibrary}}Task<string> {{operationId}}({{#bodyParam}}{{#vars}}{{{datatype}}} {{#lambda.camelcase}}{{name}}{{/lambda.camelcase}}{{^-last}}, {{/-last}}{{/vars}}{{#hasNonBodyParams}}, {{/hasNonBodyParams}}{{/bodyParam}}{{#allParams}}{{^isBodyParam}}{{{dataType}}} {{#lambda.camelcase}}{{paramName}}{{/lambda.camelcase}}{{^-last}}, {{/-last}}{{/isBodyParam}}{{/allParams}}){{#isLibrary}};{{/isLibrary}}{{^isLibrary}}
+        {
+            // TODO: Implement your operation here.
+            {{#returnType}}
+            string response = null;
+            {{#examples}}
+            response = "{{{example}}}";
+            {{/examples}}
+            {{/returnType}}
+            Debug.Log($"[MCP] {{summary}} response: {response}");
+            return {{#returnType}}response{{/returnType}}{{^returnType}}"OK"{{/returnType}};
+        }{{/isLibrary}}
+        {{/operation}}
+    }
+    {{/operations}}
+}

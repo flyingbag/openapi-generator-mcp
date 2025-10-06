@@ -1,0 +1,20 @@
+{
+  "inputSpec": "api/openapi.yaml",
+  "generatorName": "typescript-node",
+  "templateDir": "templates/mcp-typescript",
+  "outputDir": "../generated/typescript-mcp",
+  "excludeTests": "true",
+  "isLibrary": true,
+  "packageName": "petstore-mcp",
+  "packageTitle": "Petstore MCP Server",
+  "packageVersion": "1.0.0",
+  "packageAuthors": "MCP Generator",
+  "packageDescription": "MCP server tools for Swagger Petstore API",
+  "additionalProperties": {
+    "supportsES6": "true",
+    "npmName": "petstore-mcp",
+    "npmVersion": "1.0.0",
+    "withInterfaces": "true",
+    "useSingleRequestParameter": "false"
+  }
+}

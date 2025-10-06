@@ -1,0 +1,146 @@
+{{>partial_header}}
+/**
+ * MCP Tools for {{appName}}
+ *
+ * This module contains Model Context Protocol (MCP) tool definitions.
+ * Generated from OpenAPI specification.
+ */
+
+import { Server } from "@modelcontextprotocol/sdk/server/index.js";
+import { Tool, TextContent } from "@modelcontextprotocol/sdk/types.js";
+{{#hasImport}}
+import {
+{{#imports}}
+  {{import}},
+{{/imports}}
+} from "./models/index.js";
+{{/hasImport}}
+
+/**
+ * {{classname}} MCP Tools{{#isLibrary}} Base Class{{/isLibrary}}
+ * {{#description}}
+ * {{.}}
+ * {{/description}}
+ */
+export {{#isLibrary}}abstract {{/isLibrary}}class {{classname}}McpTool{{#isLibrary}}Base{{/isLibrary}} {
+  protected server: Server;
+  {{^isLibrary}}
+  protected service?: any;
+  {{/isLibrary}}
+
+  /**
+   * Initialize {{classname}} MCP tools
+   * @param server - MCP Server instance
+   * {{^isLibrary}}@param service - Service implementation for business logic{{/isLibrary}}
+   */
+  constructor(server: Server{{^isLibrary}}, service?: any{{/isLibrary}}) {
+    this.server = server;
+    {{^isLibrary}}
+    this.service = service;
+    {{/isLibrary}}
+    this.registerTools();
+  }
+
+  /**
+   * Register all MCP tools with the server
+   */
+  protected registerTools(): void {
+    {{#operation}}
+    this.server.addTool(
+      {
+        name: "{{operationId}}",
+        description: "{{{notes}}}",
+        inputSchema: {
+          type: "object",
+          properties: {
+            {{#allParams}}
+            {{paramName}}: {
+              type: "{{#isString}}string{{/isString}}{{#isInteger}}integer{{/isInteger}}{{#isLong}}integer{{/isLong}}{{#isFloat}}number{{/isFloat}}{{#isDouble}}number{{/isDouble}}{{#isBoolean}}boolean{{/isBoolean}}{{#isArray}}array{{/isArray}}{{#isMap}}object{{/isMap}}",
+              {{#description}}description: "{{{.}}}",{{/description}}
+              {{#isEnum}}enum: [{{#allowableValues}}{{#enumVars}}"{{value}}"{{^-last}}, {{/-last}}{{/enumVars}}{{/allowableValues}}],{{/isEnum}}
+              {{#isArray}}
+              items: {
+                type: "{{#items}}{{#isString}}string{{/isString}}{{#isInteger}}integer{{/isInteger}}{{#isBoolean}}boolean{{/isBoolean}}{{#isNumber}}number{{/isNumber}}{{/items}}"
+              },
+              {{/isArray}}
+            },
+            {{/allParams}}
+          },
+          {{#hasRequiredParams}}
+          required: [{{#allParams}}{{#required}}"{{paramName}}"{{^-last}}, {{/-last}}{{/required}}{{/allParams}}],
+          {{/hasRequiredParams}}
+        } as const,
+      } as Tool,
+      this.{{operationId}}.bind(this)
+    );
+    {{/operation}}
+  }
+
+  {{#operation}}
+  /**
+   * {{summary}}
+   * {{#notes}}
+   *
+   * {{.}}
+   * {{/notes}}
+   *
+   * @param arguments - Tool input parameters
+   * @returns Promise of TextContent responses
+   * {{#vendorExtensions.x-mcp-examples}}
+   *
+   * @example
+   * {{description}}
+   * Input: {{input}}
+   * Output: {{output}}
+   * {{/vendorExtensions.x-mcp-examples}}
+   */
+  {{#isLibrary}}protected abstract {{/isLibrary}}{{^isLibrary}}protected {{/isLibrary}}async {{operationId}}(
+    arguments: {
+      {{#allParams}}
+      {{paramName}}{{^required}}?{{/required}}: {{#isString}}string{{/isString}}{{#isInteger}}number{{/isInteger}}{{#isLong}}number{{/isLong}}{{#isFloat}}number{{/isFloat}}{{#isDouble}}number{{/isDouble}}{{#isBoolean}}boolean{{/isBoolean}}{{#isArray}}{{#items}}{{datatype}}{{/items}}[]{{/isArray}}{{#isMap}}Record<string, {{#items}}{{datatype}}{{/items}}>{{/isMap}};
+      {{/allParams}}
+    }
+  ): Promise<TextContent[]>{{#isLibrary}};{{/isLibrary}}{{^isLibrary}} {
+    try {
+      {{#allParams}}
+      const {{paramName}} = arguments.{{paramName}};
+      {{/allParams}}
+
+      // Call service method
+      {{#returnType}}const result = {{/returnType}}await this.service?.{{operationId}}({{#allParams}}{{paramName}}{{^-last}}, {{/-last}}{{/allParams}});
+
+      {{#returnType}}
+      // Serialize result to JSON
+      const responseJson = JSON.stringify(result, null, 2);
+      {{/returnType}}
+      {{^returnType}}
+      const responseJson = JSON.stringify({
+        success: true,
+        message: "Operation completed"
+      });
+      {{/returnType}}
+
+      return [
+        {
+          type: "text",
+          text: responseJson,
+        } as TextContent,
+      ];
+    } catch (error) {
+      const errorResponse = JSON.stringify({
+        success: false,
+        error: error instanceof Error ? error.message : String(error),
+        operation: "{{operationId}}",
+      });
+
+      return [
+        {
+          type: "text",
+          text: errorResponse,
+        } as TextContent,
+      ];
+    }
+  }{{/isLibrary}}
+
+  {{/operation}}
+}

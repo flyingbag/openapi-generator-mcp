@@ -1,0 +1,72 @@
+{{>partial_header}}
+"""
+{{#models}}{{#model}}{{classname}}{{/model}}{{/models}} model definition.
+"""
+
+from typing import Optional, List, Dict, Any
+from pydantic import BaseModel, Field{{#hasEnums}}, field_validator{{/hasEnums}}
+{{#hasDateTime}}
+from datetime import datetime
+{{/hasDateTime}}
+
+{{#models}}
+{{#model}}
+{{#isEnum}}
+from enum import Enum
+
+class {{classname}}(str, Enum):
+    """
+    {{#description}}{{.}}{{/description}}{{^description}}{{classname}} enum{{/description}}
+    """
+    {{#allowableValues}}
+    {{#enumVars}}
+    {{name}} = "{{value}}"
+    {{/enumVars}}
+    {{/allowableValues}}
+{{/isEnum}}
+{{^isEnum}}
+
+class {{classname}}(BaseModel):
+    """
+    {{#description}}{{.}}{{/description}}{{^description}}{{classname}} model{{/description}}
+    """
+    {{#vars}}
+    {{name}}: {{#required}}{{/required}}{{^required}}Optional[{{/required}}{{#isArray}}List[{{#items}}{{datatype}}{{/items}}]{{/isArray}}{{^isArray}}{{#isMap}}Dict[str, {{#items}}{{datatype}}{{/items}}]{{/isMap}}{{^isMap}}{{datatype}}{{/isMap}}{{/isArray}}{{^required}}]{{/required}} = Field(
+        {{^required}}default=None{{/required}}{{#required}}{{#defaultValue}}default={{.}}{{/defaultValue}}{{^defaultValue}}...{{/defaultValue}}{{/required}},
+        {{#description}}description="{{{.}}}",{{/description}}
+        {{#example}}example={{#isString}}"{{.}}"{{/isString}}{{^isString}}{{.}}{{/isString}},{{/example}}
+        alias="{{baseName}}"
+    )
+    {{/vars}}
+
+    class Config:
+        """Pydantic model configuration."""
+        populate_by_name = True
+        use_enum_values = True
+        json_schema_extra = {
+            "example": {
+                {{#vars}}
+                {{#example}}
+                "{{baseName}}": {{#isString}}"{{.}}"{{/isString}}{{^isString}}{{.}}{{/isString}}{{^-last}},{{/-last}}
+                {{/example}}
+                {{/vars}}
+            }
+        }
+    {{#hasEnums}}
+
+    {{#vars}}
+    {{#isEnum}}
+    @field_validator('{{name}}')
+    @classmethod
+    def validate_{{name}}(cls, value):
+        """Validate {{name}} enum value."""
+        allowed = [{{#allowableValues}}{{#enumVars}}"{{value}}"{{^-last}}, {{/-last}}{{/enumVars}}{{/allowableValues}}]
+        if value not in allowed:
+            raise ValueError(f"{{name}} must be one of {allowed}")
+        return value
+    {{/isEnum}}
+    {{/vars}}
+    {{/hasEnums}}
+{{/isEnum}}
+{{/model}}
+{{/models}}

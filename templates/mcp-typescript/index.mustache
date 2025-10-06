@@ -1,0 +1,21 @@
+{{>partial_header}}
+/**
+ * {{appName}} - MCP Server
+ *
+ * {{appDescription}}
+ *
+ * OpenAPI spec version: {{version}}
+ */
+
+// Export all MCP tools
+{{#apiInfo}}
+{{#apis}}
+export { {{classname}}McpTool{{#isLibrary}}Base{{/isLibrary}} } from "./{{classFilename}}.js";
+{{/apis}}
+{{/apiInfo}}
+
+// Export all models
+export * from "./models/index.js";
+
+// Package version
+export const VERSION = "{{version}}";

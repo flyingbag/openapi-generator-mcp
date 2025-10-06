@@ -1,0 +1,20 @@
+{
+  "inputSpec": "api/openapi.yaml",
+  "generatorName": "python",
+  "templateDir": "templates/mcp-python",
+  "outputDir": "../generated/python-mcp",
+  "excludeTests": "true",
+  "isLibrary": true,
+  "packageName": "petstore_mcp",
+  "packageTitle": "Petstore MCP Server",
+  "projectName": "petstore-mcp",
+  "packageVersion": "1.0.0",
+  "packageAuthors": "MCP Generator",
+  "packageDescription": "MCP server tools for Swagger Petstore API",
+  "library": "asyncio",
+  "additionalProperties": {
+    "pythonVersion": "3.8",
+    "generateSourceCodeOnly": "true",
+    "supportPython38": "true"
+  }
+}

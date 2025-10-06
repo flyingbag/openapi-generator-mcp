@@ -1,0 +1,19 @@
+{
+  "inputSpec": "api/openapi.yaml",
+  "generatorName": "csharp",
+  "templateDir": "templates/mcp",
+  "outputDir": "../generated/csharp-mcp",
+  "excludeTests": "true",
+  "nullableReferenceTypes": false,
+  "isLibrary": true,
+  "packageName": "PetstoreMcp",
+  "packageTitle": "Petstore MCP Server",
+  "sourceFolder": "src",
+  "packageAuthors": "MCP Generator",
+  "validatable": false,
+  "zeroBasedEnums": true,
+  "additionalProperties": {
+    "targetFramework": "netstandard2.1",
+    "netCoreProjectFile": "false"
+  }
+}

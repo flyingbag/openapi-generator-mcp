@@ -1,0 +1,15 @@
+{{>partial_header}}
+"""
+{{appName}} - MCP Server
+
+{{appDescription}}
+
+OpenAPI spec version: {{version}}
+"""
+
+from .{{#apiInfo}}{{#apis}}{{#-first}}{{classFilename}}{{/-first}}{{/apis}}{{/apiInfo}} import *
+
+__version__ = "{{version}}"
+__all__ = [
+    {{#apiInfo}}{{#apis}}"{{classname}}McpTool{{#isLibrary}}Base{{/isLibrary}}"{{^-last}}, {{/-last}}{{/apis}}{{/apiInfo}}
+]

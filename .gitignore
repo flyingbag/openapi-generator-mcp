@@ -1,0 +1,63 @@
+# Generated code
+generated/
+../generated/
+
+# OpenAPI Generator files
+.openapi-generator/
+.openapi-generator-ignore
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Node.js / TypeScript
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+*.tsbuildinfo
+dist/
+.npm/
+
+# .NET / C#
+bin/
+obj/
+*.dll
+*.exe
+*.pdb
+*.user
+*.suo
+*.cache
+.vs/
+
+# Test output
+test-output/
+*.log
+
+# Temporary files
+*.tmp
+*.bak
+*.orig

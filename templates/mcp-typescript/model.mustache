@@ -1,0 +1,122 @@
+{{>partial_header}}
+/**
+ * {{#models}}{{#model}}{{classname}}{{/model}}{{/models}} model definition
+ */
+
+{{#models}}
+{{#model}}
+{{#isEnum}}
+/**
+ * {{#description}}{{.}}{{/description}}{{^description}}{{classname}} enum{{/description}}
+ */
+export enum {{classname}} {
+  {{#allowableValues}}
+  {{#enumVars}}
+  {{name}} = "{{value}}",
+  {{/enumVars}}
+  {{/allowableValues}}
+}
+{{/isEnum}}
+{{^isEnum}}
+
+/**
+ * {{#description}}{{.}}{{/description}}{{^description}}{{classname}} interface{{/description}}
+ */
+export interface {{classname}} {
+  {{#vars}}
+  /**
+   * {{#description}}{{.}}{{/description}}{{^description}}{{name}} property{{/description}}
+   * {{#example}}@example {{#isString}}"{{.}}"{{/isString}}{{^isString}}{{.}}{{/isString}}{{/example}}
+   */
+  {{baseName}}{{^required}}?{{/required}}: {{#isArray}}{{#items}}{{datatype}}{{/items}}[]{{/isArray}}{{^isArray}}{{#isMap}}Record<string, {{#items}}{{datatype}}{{/items}}>{{/isMap}}{{^isMap}}{{datatype}}{{#isEnum}} | {{classname}}{{/isEnum}}{{/isMap}}{{/isArray}}{{#isNullable}} | null{{/isNullable}};
+  {{/vars}}
+}
+
+/**
+ * Type guard for {{classname}}
+ */
+export function is{{classname}}(obj: any): obj is {{classname}} {
+  if (typeof obj !== "object" || obj === null) {
+    return false;
+  }
+
+  {{#vars}}
+  {{#required}}
+  if (!("{{baseName}}" in obj)) {
+    return false;
+  }
+  {{/required}}
+  {{#isString}}
+  if (obj.{{baseName}} !== undefined && typeof obj.{{baseName}} !== "string") {
+    return false;
+  }
+  {{/isString}}
+  {{#isInteger}}
+  if (obj.{{baseName}} !== undefined && typeof obj.{{baseName}} !== "number") {
+    return false;
+  }
+  {{/isInteger}}
+  {{#isBoolean}}
+  if (obj.{{baseName}} !== undefined && typeof obj.{{baseName}} !== "boolean") {
+    return false;
+  }
+  {{/isBoolean}}
+  {{#isArray}}
+  if (obj.{{baseName}} !== undefined && !Array.isArray(obj.{{baseName}})) {
+    return false;
+  }
+  {{/isArray}}
+  {{/vars}}
+
+  return true;
+}
+
+/**
+ * Validate {{classname}} instance
+ * @throws Error if validation fails
+ */
+export function validate{{classname}}(obj: any): asserts obj is {{classname}} {
+  if (!is{{classname}}(obj)) {
+    throw new Error("Invalid {{classname}} object");
+  }
+
+  {{#vars}}
+  {{#required}}
+  if (obj.{{baseName}} === undefined || obj.{{baseName}} === null) {
+    throw new Error("{{classname}}.{{baseName}} is required");
+  }
+  {{/required}}
+  {{#isEnum}}
+  if (obj.{{baseName}} !== undefined) {
+    const allowedValues = [{{#allowableValues}}{{#enumVars}}"{{value}}"{{^-last}}, {{/-last}}{{/enumVars}}{{/allowableValues}}];
+    if (!allowedValues.includes(obj.{{baseName}})) {
+      throw new Error(`{{classname}}.{{baseName}} must be one of: ${allowedValues.join(", ")}`);
+    }
+  }
+  {{/isEnum}}
+  {{#minimum}}
+  if (obj.{{baseName}} !== undefined && obj.{{baseName}} < {{.}}) {
+    throw new Error("{{classname}}.{{baseName}} must be >= {{.}}");
+  }
+  {{/minimum}}
+  {{#maximum}}
+  if (obj.{{baseName}} !== undefined && obj.{{baseName}} > {{.}}) {
+    throw new Error("{{classname}}.{{baseName}} must be <= {{.}}");
+  }
+  {{/maximum}}
+  {{/vars}}
+}
+
+/**
+ * Example {{classname}} object
+ */
+export const {{classname}}Example: {{classname}} = {
+  {{#vars}}
+  {{#example}}
+  {{baseName}}: {{#isString}}"{{.}}"{{/isString}}{{^isString}}{{.}}{{/isString}},
+  {{/example}}
+  {{/vars}}
+};
+{{/isEnum}}
+{{/model}}
+{{/models}}

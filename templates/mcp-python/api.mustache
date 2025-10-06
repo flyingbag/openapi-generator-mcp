@@ -1,0 +1,116 @@
+{{>partial_header}}
+"""
+MCP Tools for {{appName}}
+
+This module contains Model Context Protocol (MCP) tool definitions.
+Generated from OpenAPI specification.
+"""
+
+from typing import Any, Dict, Optional, List
+from mcp.server import Server
+from mcp.types import Tool, TextContent
+import json
+{{#imports}}
+{{import}}
+{{/imports}}
+
+{{#operations}}
+class {{classname}}McpTool{{#isLibrary}}Base{{/isLibrary}}:
+    """
+    {{#description}}{{.}}{{/description}}{{^description}}MCP Tools for {{baseName}} operations{{/description}}
+    """
+
+    def __init__(self, server: Server{{^isLibrary}}, service: Any = None{{/isLibrary}}):
+        """
+        Initialize {{classname}} MCP tools.
+
+        Args:
+            server: MCP Server instance
+            {{^isLibrary}}service: Service implementation for business logic{{/isLibrary}}
+        """
+        self.server = server
+        {{^isLibrary}}self.service = service{{/isLibrary}}
+        self._register_tools()
+
+    def _register_tools(self):
+        """Register all MCP tools with the server."""
+        {{#operation}}
+        self.server.add_tool(
+            Tool(
+                name="{{operationId}}",
+                description="{{{notes}}}",
+                inputSchema={
+                    "type": "object",
+                    "properties": {
+                        {{#allParams}}
+                        "{{paramName}}": {
+                            "type": "{{#isString}}string{{/isString}}{{#isInteger}}integer{{/isInteger}}{{#isLong}}integer{{/isLong}}{{#isFloat}}number{{/isFloat}}{{#isDouble}}number{{/isDouble}}{{#isBoolean}}boolean{{/isBoolean}}{{#isArray}}array{{/isArray}}{{#isMap}}object{{/isMap}}",
+                            {{#description}}"description": "{{{.}}}",{{/description}}
+                            {{#isEnum}}"enum": [{{#allowableValues}}{{#enumVars}}"{{value}}"{{^-last}}, {{/-last}}{{/enumVars}}{{/allowableValues}}],{{/isEnum}}
+                            {{#isArray}}"items": {"type": "{{#items}}{{#isString}}string{{/isString}}{{#isInteger}}integer{{/isInteger}}{{#isBoolean}}boolean{{/isBoolean}}{{/items}}"},{{/isArray}}
+                        }{{^-last}},{{/-last}}
+                        {{/allParams}}
+                    },
+                    {{#hasRequiredParams}}"required": [{{#allParams}}{{#required}}"{{paramName}}"{{^-last}}, {{/-last}}{{/required}}{{/allParams}}],{{/hasRequiredParams}}
+                }
+            ),
+            self.{{operationId}}
+        )
+        {{/operation}}
+
+    {{#operation}}
+    async def {{operationId}}(self, arguments: Dict[str, Any]) -> list[TextContent]:
+        """
+        {{summary}}
+
+        {{#notes}}
+        {{.}}
+        {{/notes}}
+
+        Args:
+            arguments: Tool input parameters
+
+        Returns:
+            List of TextContent responses
+        {{#vendorExtensions.x-mcp-examples}}
+
+        Example:
+            {{description}}
+            Input: {{input}}
+            Output: {{output}}
+        {{/vendorExtensions.x-mcp-examples}}
+        """
+        {{#isLibrary}}
+        # TODO: Implement {{operationId}}
+        raise NotImplementedError("{{operationId}} must be implemented in derived class")
+        {{/isLibrary}}
+        {{^isLibrary}}
+        try:
+            {{#allParams}}
+            {{paramName}} = arguments.get("{{paramName}}")
+            {{/allParams}}
+
+            # Call service method
+            {{#returnType}}result = {{/returnType}}{{^returnType}}{{/returnType}}await self.service.{{operationId}}({{#allParams}}{{paramName}}{{^-last}}, {{/-last}}{{/allParams}})
+
+            {{#returnType}}
+            # Serialize result to JSON
+            response_json = json.dumps(result{{#isModel}}.dict(){{/isModel}}, indent=2)
+            {{/returnType}}
+            {{^returnType}}
+            response_json = json.dumps({"success": True, "message": "Operation completed"})
+            {{/returnType}}
+
+            return [TextContent(type="text", text=response_json)]
+
+        except Exception as e:
+            error_response = json.dumps({
+                "success": False,
+                "error": str(e),
+                "operation": "{{operationId}}"
+            })
+            return [TextContent(type="text", text=error_response)]
+        {{/isLibrary}}
+
+    {{/operation}}
+{{/operations}}
