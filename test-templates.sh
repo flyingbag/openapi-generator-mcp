@@ -66,6 +66,17 @@ run_test() {
     fi
 }
 
+# Helper function to check for absence of pattern
+check_no_match() {
+    local pattern=$1
+    local file=$2
+    if grep -E "$pattern" "$file" > /dev/null 2>&1; then
+        return 1  # Pattern found - test fails
+    else
+        return 0  # Pattern not found - test passes
+    fi
+}
+
 echo -e "${BLUE}=== Template Validation Tests ===${NC}"
 echo ""
 
@@ -135,15 +146,15 @@ echo ""
 
 # Test 5: Check for common template issues
 run_test "C# template has no unclosed mustache tags" \
-    "! grep -E '{{[^}]*$' templates/mcp-csharp/api.mustache" \
+    "check_no_match '{{[^}]*\$' templates/mcp-csharp/api.mustache" \
     ""
 
 run_test "Python template has no unclosed mustache tags" \
-    "! grep -E '{{[^}]*$' templates/mcp-python/api.mustache" \
+    "check_no_match '{{[^}]*\$' templates/mcp-python/api.mustache" \
     ""
 
 run_test "TypeScript template has no unclosed mustache tags" \
-    "! grep -E '{{[^}]*$' templates/mcp-typescript/api.mustache" \
+    "check_no_match '{{[^}]*\$' templates/mcp-typescript/api.mustache" \
     ""
 
 echo ""
