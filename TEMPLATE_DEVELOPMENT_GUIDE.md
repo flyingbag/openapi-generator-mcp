@@ -143,7 +143,7 @@ Priority: {{priority}}
 
 | Variable | Type | Description |
 |----------|------|-------------|
-| `classname` | string | API class name (e.g., SceneApi) |
+| `classname` | string | API class name (e.g., PetApi) |
 | `baseName` | string | Base name without "Api" suffix |
 | `operations` | array | Array of operations |
 | `operation` | object | Current operation context |
@@ -305,7 +305,7 @@ Create `config/mcp-<language>.json`:
   "generatorName": "<language>",
   "templateDir": "templates/mcp-<language>",
   "outputDir": "../generated/<language>-mcp",
-  "packageName": "unity_context_bridge_mcp",
+  "packageName": "petstore_mcp",
   "isLibrary": true
 }
 ```
@@ -580,7 +580,7 @@ Key features:
 
 ### Complete C# Example
 
-See: `templates/mcp/api.mustache`
+See: `templates/mcp-csharp/api.mustache`
 
 Key features:
 - Abstract base classes
@@ -623,4 +623,3 @@ Key features:
 
 **Version:** 1.0.0
 **Last Updated:** 2025-10-06
-**Maintainer:** Unity AI-QA Team

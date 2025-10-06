@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -e
+set -e -o pipefail
 
 # Colors for output
 GREEN='\033[0;32m'
@@ -39,29 +39,29 @@ run_test() {
     local test_command=$2
     local expected_output=$3
 
-    ((TESTS_TOTAL++))
+    TESTS_TOTAL=$((TESTS_TOTAL + 1))
     echo -e "${BLUE}Test $TESTS_TOTAL: $test_name${NC}"
 
     if eval "$test_command" > "$TEST_OUTPUT_DIR/test_$TESTS_TOTAL.log" 2>&1; then
         if [ -n "$expected_output" ]; then
             if grep -q "$expected_output" "$TEST_OUTPUT_DIR/test_$TESTS_TOTAL.log"; then
                 echo -e "${GREEN}  ✓ PASSED${NC}"
-                ((TESTS_PASSED++))
+                TESTS_PASSED=$((TESTS_PASSED + 1))
                 return 0
             else
                 echo -e "${RED}  ✗ FAILED - Expected output not found${NC}"
-                ((TESTS_FAILED++))
+                TESTS_FAILED=$((TESTS_FAILED + 1))
                 return 1
             fi
         else
             echo -e "${GREEN}  ✓ PASSED${NC}"
-            ((TESTS_PASSED++))
+            TESTS_PASSED=$((TESTS_PASSED + 1))
             return 0
         fi
     else
         echo -e "${RED}  ✗ FAILED - Command failed${NC}"
         cat "$TEST_OUTPUT_DIR/test_$TESTS_TOTAL.log"
-        ((TESTS_FAILED++))
+        TESTS_FAILED=$((TESTS_FAILED + 1))
         return 1
     fi
 }
@@ -71,7 +71,7 @@ echo ""
 
 # Test 1: Check if template files exist
 run_test "C# templates exist" \
-    "test -f templates/mcp/api.mustache" \
+    "test -f templates/mcp-csharp/api.mustache" \
     ""
 
 run_test "Python templates exist" \
@@ -135,7 +135,7 @@ echo ""
 
 # Test 5: Check for common template issues
 run_test "C# template has no unclosed mustache tags" \
-    "! grep -E '{{[^}]*$' templates/mcp/api.mustache" \
+    "! grep -E '{{[^}]*$' templates/mcp-csharp/api.mustache" \
     ""
 
 run_test "Python template has no unclosed mustache tags" \

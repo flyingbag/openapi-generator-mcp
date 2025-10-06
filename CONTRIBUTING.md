@@ -138,10 +138,10 @@ openapi-generator-mcp/
 ├── api/                   # Example OpenAPI specifications
 ├── config/                # Generator configurations
 ├── templates/             # Mustache templates
-│   ├── mcp/              # C# templates
-│   ├── mcp-python/       # Python templates
-│   ├── mcp-typescript/   # TypeScript templates
-│   └── mcp-go/           # Go templates
+│   ├── mcp-csharp/        # C# templates
+│   ├── mcp-python/        # Python templates
+│   ├── mcp-typescript/    # TypeScript templates
+│   └── mcp-go/            # Go templates
 ├── examples/              # Example implementations
 ├── scripts/               # Utility scripts
 ├── schemas/               # JSON schemas

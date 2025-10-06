@@ -305,7 +305,7 @@ npm install
 
 **C#: Compilation errors**
 - Verify OpenAPI types are compatible
-- Check template: `templates/mcp/api.mustache`
+- Check template: `templates/mcp-csharp/api.mustache`
 
 ## 11. Test Checklist
 

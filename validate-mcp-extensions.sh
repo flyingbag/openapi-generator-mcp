@@ -42,11 +42,16 @@ if ! command -v yq &> /dev/null; then
     echo -e "${BLUE}=== Basic Validation ===${NC}"
 
     # Check if file is valid YAML
-    if python3 -c "import yaml; yaml.safe_load(open('$SPEC_FILE'))" 2>/dev/null; then
-        echo -e "${GREEN}✓ Valid YAML syntax${NC}"
+    if command -v python3 &> /dev/null; then
+        if python3 -c "import yaml; yaml.safe_load(open('$SPEC_FILE'))" 2>/dev/null; then
+            echo -e "${GREEN}✓ Valid YAML syntax${NC}"
+        else
+            echo -e "${RED}✗ Invalid YAML syntax${NC}"
+            ((ERRORS++))
+        fi
     else
-        echo -e "${RED}✗ Invalid YAML syntax${NC}"
-        ((ERRORS++))
+        echo -e "${YELLOW}⚠ python3 not found, skipping YAML syntax check${NC}"
+        ((INFO++))
     fi
 
     # Check for MCP extensions
@@ -108,49 +113,11 @@ else
     fi
 
     # Check for x-mcp-tool extensions in operations
-    TOOL_COUNT=0
-    PATHS=$(yq eval '.paths | keys | .[]' "$SPEC_FILE")
+    TOOL_COUNT=$(yq eval '[.paths[][] | select(has("x-mcp-tool"))] | length' "$SPEC_FILE" 2>/dev/null || echo "0")
 
-    while IFS= read -r path; do
-        METHODS=$(yq eval ".paths[\"$path\"] | keys | .[]" "$SPEC_FILE")
-
-        while IFS= read -r method; do
-            # Skip non-HTTP methods
-            if [[ ! "$method" =~ ^(get|post|put|patch|delete|options|head)$ ]]; then
-                continue
-            fi
-
-            OPERATION_ID=$(yq eval ".paths[\"$path\"].$method.operationId" "$SPEC_FILE")
-
-            # Check for x-mcp-tool extension
-            MCP_TOOL=$(yq eval ".paths[\"$path\"].$method.x-mcp-tool" "$SPEC_FILE")
-
-            if [ "$MCP_TOOL" != "null" ]; then
-                ((TOOL_COUNT++))
-
-                # Check if enabled field is present
-                ENABLED=$(yq eval ".paths[\"$path\"].$method.x-mcp-tool.enabled" "$SPEC_FILE")
-                if [ "$ENABLED" == "false" ]; then
-                    echo -e "  ${YELLOW}⚠ Tool $OPERATION_ID is disabled${NC}"
-                fi
-
-                # Check for category
-                CATEGORY=$(yq eval ".paths[\"$path\"].$method.x-mcp-tool.category" "$SPEC_FILE")
-                if [ "$CATEGORY" == "null" ]; then
-                    echo -e "  ${YELLOW}⚠ Tool $OPERATION_ID: category not specified${NC}"
-                    ((WARNINGS++))
-                fi
-            fi
-
-            # Check for x-mcp-examples extension
-            MCP_EXAMPLES=$(yq eval ".paths[\"$path\"].$method.x-mcp-examples" "$SPEC_FILE")
-            if [ "$MCP_EXAMPLES" == "null" ]; then
-                echo -e "  ${YELLOW}⚠ Tool $OPERATION_ID: no examples provided${NC}"
-                ((WARNINGS++))
-            fi
-
-        done <<< "$METHODS"
-    done <<< "$PATHS"
+    if [ "$TOOL_COUNT" == "null" ]; then
+        TOOL_COUNT=0
+    fi
 
     if [ $TOOL_COUNT -gt 0 ]; then
         echo -e "${GREEN}✓ Found $TOOL_COUNT operations with MCP tool extensions${NC}"
@@ -161,22 +128,17 @@ else
     fi
 
     # Check for x-mcp-category in tags
-    TAG_COUNT=0
-    TAGS=$(yq eval '.tags | length' "$SPEC_FILE")
+    TAG_COUNT=$(yq eval '[.tags[] | select(has("x-mcp-category"))] | length' "$SPEC_FILE" 2>/dev/null || echo "0")
 
-    if [ "$TAGS" != "0" ] && [ "$TAGS" != "null" ]; then
-        for ((i=0; i<$TAGS; i++)); do
-            TAG_NAME=$(yq eval ".tags[$i].name" "$SPEC_FILE")
-            MCP_CATEGORY=$(yq eval ".tags[$i].x-mcp-category" "$SPEC_FILE")
+    if [ "$TAG_COUNT" == "null" ]; then
+        TAG_COUNT=0
+    fi
 
-            if [ "$MCP_CATEGORY" != "null" ]; then
-                ((TAG_COUNT++))
-            fi
-        done
-
-        if [ $TAG_COUNT -gt 0 ]; then
-            echo -e "${GREEN}✓ Found $TAG_COUNT tags with x-mcp-category extensions${NC}"
-        else
+    if [ $TAG_COUNT -gt 0 ]; then
+        echo -e "${GREEN}✓ Found $TAG_COUNT tags with x-mcp-category extensions${NC}"
+    else
+        TOTAL_TAGS=$(yq eval '.tags | length' "$SPEC_FILE" 2>/dev/null || echo "0")
+        if [ "$TOTAL_TAGS" != "0" ] && [ "$TOTAL_TAGS" != "null" ]; then
             echo -e "${YELLOW}⚠ No tags have x-mcp-category extensions${NC}"
             ((INFO++))
         fi

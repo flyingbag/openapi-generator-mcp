@@ -104,12 +104,8 @@ post_process_language() {
 
     case $lang in
         csharp)
-            if [ -f "post-process-mcp.sh" ]; then
-                echo -e "${YELLOW}Running C# post-processing...${NC}"
-                export CSHARP_POST_PROCESS_FILE="bash post-process-mcp.sh ../Editor/ContextBridge"
-                bash post-process-mcp.sh ../Editor/ContextBridge
-                echo -e "${GREEN}✓ C# post-processing complete${NC}"
-            fi
+            # C# post-processing (if needed in future)
+            echo -e "${YELLOW}No post-processing needed for C#${NC}"
             ;;
         python)
             # Python post-processing (if needed in future)
@@ -137,9 +133,9 @@ for lang in "${LANG_ARRAY[@]}"; do
 
     if generate_language "$lang"; then
         post_process_language "$lang"
-        ((SUCCESS_COUNT++))
+        SUCCESS_COUNT=$((SUCCESS_COUNT + 1))
     else
-        ((FAILURE_COUNT++))
+        FAILURE_COUNT=$((FAILURE_COUNT + 1))
         FAILED_LANGUAGES+=("$lang")
     fi
     echo ""
@@ -164,13 +160,16 @@ for lang in "${LANG_ARRAY[@]}"; do
     lang=$(echo "$lang" | tr '[:upper:]' '[:lower:]' | xargs)
     case $lang in
         csharp)
-            echo "  C#: ../Editor/ContextBridge/Interface/*McpToolBase.cs"
+            echo "  C#: ../generated/csharp-mcp/"
             ;;
         python)
             echo "  Python: ../generated/python-mcp/"
             ;;
         typescript)
             echo "  TypeScript: ../generated/typescript-mcp/"
+            ;;
+        go)
+            echo "  Go: ../generated/go-mcp/"
             ;;
     esac
 done

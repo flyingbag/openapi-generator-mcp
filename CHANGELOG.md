@@ -18,7 +18,7 @@ All notable changes to this project will be documented in this file.
 - ✅ `.gitignore` for generated files
 
 ### Changed
-- Migrated from Unity Context Bridge API to generic Petstore API
+- Update API to generic Petstore API
 - Updated all configuration files to use Petstore naming
 - Updated example files to demonstrate real API calls
 

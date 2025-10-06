@@ -4,8 +4,6 @@ using ModelContextProtocol.Server;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using {{sourceFolder}}.{{packageName}}.Model;
-{{^isLibrary}}using UnityEngine;
-{{/isLibrary}}
 
 namespace {{sourceFolder}}.{{packageName}}.{{#isLibrary}}Interface{{/isLibrary}}{{^isLibrary}}Mcp{{/isLibrary}}
 {
@@ -23,7 +21,7 @@ namespace {{sourceFolder}}.{{packageName}}.{{#isLibrary}}Interface{{/isLibrary}}
         /// <remarks>
         /// {{#isLibrary}}{{#returnType}}string response = null;
         /// {{#examples}}response = "{{{example}}}";
-        /// {{/examples}}{{/returnType}}Debug.Log($"[MCP] {{summary}} response: {response}");
+        /// {{/examples}}{{/returnType}}// TODO: Implement business logic
         /// return {{#returnType}}response{{/returnType}}{{^returnType}}"OK"{{/returnType}};{{/isLibrary}}{{^isLibrary}}{{.}}{{/isLibrary}}
         /// </remarks>
         {{/notes}}
@@ -38,7 +36,7 @@ namespace {{sourceFolder}}.{{packageName}}.{{#isLibrary}}Interface{{/isLibrary}}
             response = "{{{example}}}";
             {{/examples}}
             {{/returnType}}
-            Debug.Log($"[MCP] {{summary}} response: {response}");
+            // TODO: Implement business logic
             return {{#returnType}}response{{/returnType}}{{^returnType}}"OK"{{/returnType}};
         }{{/isLibrary}}
         {{/operation}}

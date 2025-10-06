@@ -104,13 +104,13 @@ public class PetMcpTool : PetMcpToolBase
 ```
 .
 ├── api/
-│   └── openapi.yaml                  # OpenAPI specification with MCP extensions
+│   └── openapi.yaml                 # OpenAPI specification with MCP extensions
 ├── config/
 │   ├── mcp-csharp.json              # C# generator configuration
 │   ├── mcp-python.json              # Python generator configuration
 │   └── mcp-typescript.json          # TypeScript generator configuration
 ├── templates/
-│   ├── mcp/                         # C# Mustache templates
+│   ├── mcp-csharp/                  # C# Mustache templates
 │   ├── mcp-python/                  # Python Mustache templates
 │   └── mcp-typescript/              # TypeScript Mustache templates
 ├── examples/                        # Example implementations

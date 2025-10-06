@@ -12,7 +12,7 @@ This generator extends OpenAPI Generator to produce MCP-compatible server code f
 ## Architecture
 
 ```
-OpenAPI Spec (contextbridge.yaml)
+OpenAPI Spec (openapi.yaml)
          ↓
 OpenAPI Generator + Custom Templates
          ↓
@@ -34,13 +34,13 @@ C# MCP Tools   Python MCP    TypeScript MCP
 ```
 openapitools/
 ├── api/
-│   └── contextbridge.yaml           # OpenAPI specification
+│   └── openapi.yaml                # OpenAPI specification
 ├── config/
 │   ├── mcp-csharp.json             # C# generator config
 │   ├── mcp-python.json             # Python generator config
 │   └── mcp-typescript.json         # TypeScript generator config
 ├── templates/
-│   ├── mcp/                        # C# templates (existing)
+│   ├── mcp-csharp/                 # C# templates (existing)
 │   │   └── api.mustache
 │   ├── mcp-python/                 # Python templates (new)
 │   │   ├── api.mustache
@@ -94,21 +94,21 @@ cd openapitools
 
 ### C# Output
 ```
-Editor/ContextBridge/Interface/
-├── SceneMcpToolBase.cs
-├── ObjectMcpToolBase.cs
-├── AssetMcpToolBase.cs
+generated/csharp-mcp/Interface/
+├── PetMcpToolBase.cs
+├── StoreMcpToolBase.cs
+├── UserMcpToolBase.cs
 └── ...
 ```
 
 **Usage:**
 ```csharp
 [McpServerToolType]
-public class SceneMcpTool : SceneMcpToolBase
+public class PetMcpTool : PetMcpToolBase
 {
-    public override async Task<string> GetSceneInfo()
+    public override async Task<string> GetPetById(long petId)
     {
-        var result = await _sceneService.GetSceneInfoAsync();
+        var result = await _petService.GetPetByIdAsync(petId);
         return JsonConvert.SerializeObject(result);
     }
 }
@@ -117,13 +117,15 @@ public class SceneMcpTool : SceneMcpToolBase
 ### Python Output
 ```
 generated/python-mcp/
-├── unity_context_bridge_mcp/
+├── petstore_mcp/
 │   ├── __init__.py
-│   ├── scene_mcp_tool.py
-│   ├── object_mcp_tool.py
+│   ├── pet_mcp_tool.py
+│   ├── store_mcp_tool.py
+│   ├── user_mcp_tool.py
 │   ├── models/
 │   │   ├── __init__.py
-│   │   ├── scene_info_response.py
+│   │   ├── pet.py
+│   │   ├── order.py
 │   │   └── ...
 │   └── requirements.txt
 ```
@@ -131,10 +133,12 @@ generated/python-mcp/
 **Usage:**
 ```python
 from mcp.server import Server
-from unity_context_bridge_mcp import SceneMcpTool
+from petstore_mcp import PetMcpTool, StoreMcpTool, UserMcpTool
 
-server = Server("unity-context-bridge")
-scene_tool = SceneMcpTool(server, service_implementation)
+server = Server("petstore-mcp")
+pet_tool = PetMcpTool(server, pet_service)
+store_tool = StoreMcpTool(server, store_service)
+user_tool = UserMcpTool(server, user_service)
 
 # Tools are automatically registered with the server
 ```
@@ -161,7 +165,7 @@ scene_tool = SceneMcpTool(server, service_implementation)
      "generatorName": "<language>",
      "templateDir": "templates/mcp-<language>",
      "outputDir": "../generated/<language>-mcp",
-     "packageName": "unity_context_bridge_mcp"
+     "packageName": "petstore_mcp"
    }
    ```
 
@@ -429,4 +433,3 @@ mustache --version
 
 **Version:** 1.0.0
 **Last Updated:** 2025-10-06
-**Maintainer:** Unity AI-QA Team

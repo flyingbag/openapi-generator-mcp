@@ -20,12 +20,12 @@ Controls MCP tool-specific generation settings.
 **Example:**
 ```yaml
 paths:
-  /scene/info:
+  /pet/{petId}:
     get:
-      operationId: getSceneInfo
+      operationId: getPetById
       x-mcp-tool:
         enabled: true
-        category: "scene"
+        category: "pet"
         priority: 100
 ```
 
@@ -42,17 +42,18 @@ Provides MCP-specific examples for tool usage.
 **Example:**
 ```yaml
 paths:
-  /object:
+  /pet:
     post:
-      operationId: createObject
+      operationId: addPet
       x-mcp-examples:
-        - description: "Create a cube at origin"
+        - description: "Add a new pet to the store"
           input:
-            type: "Cube"
-            position: [0, 0, 0]
+            name: "doggie"
+            status: "available"
           output:
-            success: true
-            message: "Cube created successfully"
+            id: 123
+            name: "doggie"
+            status: "available"
 ```
 
 ### Schema-Level Extensions
@@ -66,16 +67,16 @@ Provides JSON Schema overrides for MCP tool input validation.
 ```yaml
 components:
   schemas:
-    CreateObjectRequest:
+    Pet:
       type: object
       properties:
-        type:
+        status:
           type: string
-          enum: ["Cube", "Sphere", "Cylinder"]
+          enum: ["available", "pending", "sold"]
       x-mcp-input-schema:
         type: string
-        enum: ["Cube", "Sphere", "Cylinder", "Capsule", "Plane"]
-        description: "Primitive type to create"
+        enum: ["available", "pending", "sold"]
+        description: "Pet status in the store"
 ```
 
 ### Info-Level Extensions
@@ -95,13 +96,13 @@ Defines MCP server metadata.
 **Example:**
 ```yaml
 info:
-  title: Unity Context Bridge API
+  title: Swagger Petstore API
   version: "1.0.0"
   x-mcp-server:
-    name: "unity-context-bridge"
+    name: "petstore-mcp"
     version: "1.0.0"
-    author: "Unity Technologies"
-    license: "MIT"
+    description: "MCP server for Swagger Petstore API"
+    license: "Apache-2.0"
 ```
 
 ### Tag-Level Extensions
@@ -119,12 +120,12 @@ Maps OpenAPI tags to MCP tool categories.
 **Example:**
 ```yaml
 tags:
-  - name: Scene
-    description: Scene management operations
+  - name: pet
+    description: Pet management operations
     x-mcp-category:
-      name: "Scene Management"
-      description: "Tools for managing Unity scenes"
-      icon: "🎬"
+      name: "Pet Management"
+      description: "Tools for managing pets in the store"
+      icon: "🐾"
 ```
 
 ## Usage in Templates
@@ -167,33 +168,35 @@ async def {{name}}({{#allParams}}{{paramName}}: {{dataType}}{{^-last}}, {{/-last
 **Before:**
 ```yaml
 paths:
-  /scene/info:
+  /pet/{petId}:
     get:
-      operationId: getSceneInfo
-      summary: "Retrieve Scene Information"
+      operationId: getPetById
+      summary: "Find pet by ID"
       tags:
-        - Scene
+        - pet
 ```
 
 **After:**
 ```yaml
 paths:
-  /scene/info:
+  /pet/{petId}:
     get:
-      operationId: getSceneInfo
-      summary: "Retrieve Scene Information"
+      operationId: getPetById
+      summary: "Find pet by ID"
       tags:
-        - Scene
+        - pet
       x-mcp-tool:
         enabled: true
-        category: "scene"
+        category: "pet"
         priority: 100
       x-mcp-examples:
-        - description: "Get current scene info"
-          input: {}
+        - description: "Get pet by ID"
+          input:
+            petId: 123
           output:
-            sceneName: "MainScene"
-            rootObjects: ["Camera", "Light"]
+            id: 123
+            name: "doggie"
+            status: "available"
 ```
 
 ## Best Practices
@@ -224,4 +227,3 @@ Planned extensions for future versions:
 
 **Version:** 1.0.0
 **Last Updated:** 2025-10-06
-**Maintainer:** Unity AI-QA Team
