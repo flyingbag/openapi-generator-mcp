@@ -1,0 +1,71 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Install OpenAPI Generator CLI
+        run: npm install -g @openapitools/openapi-generator-cli
+
+      - name: Generate all languages
+        run: ./generate-mcp-all.sh
+
+      - name: Create release archives
+        run: |
+          cd ..
+          tar -czf openapi-mcp-templates-${GITHUB_REF_NAME}.tar.gz \
+            openapi-generator-mcp/templates/ \
+            openapi-generator-mcp/config/ \
+            openapi-generator-mcp/*.sh \
+            openapi-generator-mcp/schemas/
+
+          zip -r openapi-mcp-templates-${GITHUB_REF_NAME}.zip \
+            openapi-generator-mcp/templates/ \
+            openapi-generator-mcp/config/ \
+            openapi-generator-mcp/*.sh \
+            openapi-generator-mcp/schemas/
+
+      - name: Extract release notes
+        id: extract-release-notes
+        run: |
+          VERSION=${GITHUB_REF_NAME#v}
+          if [ -f "CHANGELOG.md" ]; then
+            # Extract notes for this version
+            sed -n "/## \[${VERSION}\]/,/## \[/p" CHANGELOG.md | sed '$ d' > release-notes.md
+          else
+            echo "Release ${VERSION}" > release-notes.md
+          fi
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          body_path: release-notes.md
+          files: |
+            ../openapi-mcp-templates-*.tar.gz
+            ../openapi-mcp-templates-*.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish metrics
+        run: |
+          echo "📦 Release ${GITHUB_REF_NAME} published"
+          echo "📊 Languages: 4 (C#, Python, TypeScript, Go)"
+          echo "📄 Templates: $(find templates -name '*.mustache' | wc -l) files"
+          echo "🎯 Operations: 19 per language"

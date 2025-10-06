@@ -1,7 +1,7 @@
 {
   "inputSpec": "api/openapi.yaml",
   "generatorName": "csharp",
-  "templateDir": "templates/mcp",
+  "templateDir": "templates/mcp-csharp",
   "outputDir": "../generated/csharp-mcp",
   "excludeTests": "true",
   "nullableReferenceTypes": false,

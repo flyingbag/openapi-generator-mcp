@@ -1,0 +1,303 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://modelcontextprotocol.io/schemas/openapi-mcp-extensions.json",
+  "title": "MCP OpenAPI Extensions Schema",
+  "description": "JSON Schema for validating Model Context Protocol extensions in OpenAPI specifications",
+  "version": "1.0.0",
+  "definitions": {
+    "x-mcp-server": {
+      "type": "object",
+      "description": "Server-level MCP metadata",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "MCP server name (kebab-case recommended)",
+          "pattern": "^[a-z0-9-]+$",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "version": {
+          "type": "string",
+          "description": "Semantic version of the MCP server",
+          "pattern": "^\\d+\\.\\d+\\.\\d+(-[a-zA-Z0-9.-]+)?(\\+[a-zA-Z0-9.-]+)?$"
+        },
+        "description": {
+          "type": "string",
+          "description": "Human-readable description of the MCP server",
+          "minLength": 10,
+          "maxLength": 500
+        },
+        "author": {
+          "type": "string",
+          "description": "Author or organization name"
+        },
+        "license": {
+          "type": "string",
+          "description": "SPDX license identifier",
+          "examples": ["MIT", "Apache-2.0", "GPL-3.0"]
+        },
+        "homepage": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL to project homepage"
+        },
+        "repository": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL to source repository"
+        }
+      },
+      "required": ["name", "version"],
+      "additionalProperties": false
+    },
+    "x-mcp-category": {
+      "type": "object",
+      "description": "Tag-level MCP category metadata",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Display name for the category",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "description": {
+          "type": "string",
+          "description": "Category description",
+          "minLength": 10,
+          "maxLength": 500
+        },
+        "icon": {
+          "type": "string",
+          "description": "Unicode emoji or icon identifier",
+          "pattern": "^[\\p{Emoji}]$|^[a-z0-9-]+$"
+        },
+        "color": {
+          "type": "string",
+          "description": "Hex color code for UI theming",
+          "pattern": "^#[0-9A-Fa-f]{6}$"
+        },
+        "priority": {
+          "type": "integer",
+          "description": "Display priority (higher = more important)",
+          "minimum": 0,
+          "maximum": 1000,
+          "default": 50
+        },
+        "deprecated": {
+          "type": "boolean",
+          "description": "Mark category as deprecated",
+          "default": false
+        }
+      },
+      "required": ["name"],
+      "additionalProperties": false
+    },
+    "x-mcp-tool": {
+      "type": "object",
+      "description": "Operation-level MCP tool metadata",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Whether this tool is enabled",
+          "default": true
+        },
+        "category": {
+          "type": "string",
+          "description": "Category/tag this tool belongs to",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "priority": {
+          "type": "integer",
+          "description": "Tool priority for ordering and suggestions",
+          "minimum": 0,
+          "maximum": 100,
+          "default": 50
+        },
+        "requires_auth": {
+          "type": "boolean",
+          "description": "Whether authentication is required",
+          "default": false
+        },
+        "rate_limit": {
+          "type": "object",
+          "description": "Rate limiting configuration",
+          "properties": {
+            "requests": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "per": {
+              "type": "string",
+              "enum": ["second", "minute", "hour", "day"]
+            }
+          },
+          "required": ["requests", "per"]
+        },
+        "timeout": {
+          "type": "integer",
+          "description": "Timeout in milliseconds",
+          "minimum": 100,
+          "maximum": 300000
+        },
+        "experimental": {
+          "type": "boolean",
+          "description": "Mark tool as experimental",
+          "default": false
+        },
+        "deprecated": {
+          "type": "boolean",
+          "description": "Mark tool as deprecated",
+          "default": false
+        },
+        "tags": {
+          "type": "array",
+          "description": "Additional tags for filtering/search",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 32
+          },
+          "uniqueItems": true,
+          "maxItems": 10
+        }
+      },
+      "additionalProperties": false
+    },
+    "x-mcp-examples": {
+      "type": "array",
+      "description": "Example inputs and outputs for the tool",
+      "items": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string",
+            "description": "Human-readable description of the example",
+            "minLength": 5,
+            "maxLength": 200
+          },
+          "input": {
+            "type": "object",
+            "description": "Example input parameters"
+          },
+          "output": {
+            "description": "Example output/response"
+          },
+          "error": {
+            "type": "object",
+            "description": "Example error response (optional)",
+            "properties": {
+              "code": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "required": ["description", "input"],
+        "additionalProperties": false
+      },
+      "minItems": 1,
+      "maxItems": 5
+    },
+    "x-mcp-resource": {
+      "type": "object",
+      "description": "MCP Resource definition (future use)",
+      "properties": {
+        "uri": {
+          "type": "string",
+          "format": "uri",
+          "description": "Resource URI template"
+        },
+        "name": {
+          "type": "string",
+          "description": "Resource name"
+        },
+        "mimeType": {
+          "type": "string",
+          "description": "MIME type of the resource"
+        },
+        "description": {
+          "type": "string"
+        }
+      },
+      "required": ["uri", "name"]
+    },
+    "x-mcp-prompt": {
+      "type": "object",
+      "description": "MCP Prompt definition (future use)",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Prompt name"
+        },
+        "description": {
+          "type": "string"
+        },
+        "arguments": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "required": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "required": ["name"]
+    }
+  },
+  "type": "object",
+  "properties": {
+    "info": {
+      "type": "object",
+      "properties": {
+        "x-mcp-server": {
+          "$ref": "#/definitions/x-mcp-server"
+        }
+      }
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "x-mcp-category": {
+            "$ref": "#/definitions/x-mcp-category"
+          }
+        }
+      }
+    },
+    "paths": {
+      "type": "object",
+      "patternProperties": {
+        "^/": {
+          "type": "object",
+          "patternProperties": {
+            "^(get|put|post|delete|options|head|patch|trace)$": {
+              "type": "object",
+              "properties": {
+                "x-mcp-tool": {
+                  "$ref": "#/definitions/x-mcp-tool"
+                },
+                "x-mcp-examples": {
+                  "$ref": "#/definitions/x-mcp-examples"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

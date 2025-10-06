@@ -1,0 +1,17 @@
+{
+  "inputSpec": "api/openapi.yaml",
+  "generatorName": "go",
+  "templateDir": "templates/mcp-go",
+  "outputDir": "../generated/go-mcp",
+  "packageName": "petstoreMcp",
+  "gitUserId": "openapi-generator",
+  "gitRepoId": "petstore-mcp-go",
+  "additionalProperties": {
+    "packageVersion": "1.0.0",
+    "goVersion": "1.21",
+    "enumClassPrefix": true,
+    "structPrefix": false,
+    "isGoSubmodule": false,
+    "withGoMod": true
+  }
+}

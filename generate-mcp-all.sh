@@ -13,7 +13,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
 
 # Default languages
-DEFAULT_LANGUAGES="csharp,python"
+DEFAULT_LANGUAGES="csharp,python,typescript"
 
 # Parse arguments
 LANGUAGES="${1:-$DEFAULT_LANGUAGES}"
@@ -39,8 +39,8 @@ while [[ $# -gt 0 ]]; do
             echo "Usage: $0 [OPTIONS]"
             echo ""
             echo "Options:"
-            echo "  --languages=LANGS    Comma-separated list of languages (default: csharp,python)"
-            echo "                       Available: csharp, python, typescript"
+            echo "  --languages=LANGS    Comma-separated list of languages (default: csharp,python,typescript)"
+            echo "                       Available: csharp, python, typescript, go"
             echo "  --dry-run           Show what would be generated without generating"
             echo "  --skip-post-process Skip post-processing steps"
             echo "  --help              Show this help message"
@@ -118,6 +118,10 @@ post_process_language() {
         typescript)
             # TypeScript post-processing (if needed in future)
             echo -e "${YELLOW}No post-processing needed for TypeScript${NC}"
+            ;;
+        go)
+            # Go post-processing (if needed in future)
+            echo -e "${YELLOW}No post-processing needed for Go${NC}"
             ;;
     esac
 }
