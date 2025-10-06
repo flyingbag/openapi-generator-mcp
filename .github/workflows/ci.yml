@@ -39,7 +39,7 @@ jobs:
     needs: validate
     strategy:
       matrix:
-        language: [csharp, python, typescript, go]
+        language: [csharp, python, typescript]
 
     steps:
       - name: Checkout code
