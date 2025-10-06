@@ -1,6 +1,7 @@
 # Generated code
 generated/
 ../generated/
+artifacts/
 
 # OpenAPI Generator files
 .openapi-generator/
