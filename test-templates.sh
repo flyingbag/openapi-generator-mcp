@@ -42,7 +42,15 @@ run_test() {
     TESTS_TOTAL=$((TESTS_TOTAL + 1))
     echo -e "${BLUE}Test $TESTS_TOTAL: $test_name${NC}"
 
-    if eval "$test_command" > "$TEST_OUTPUT_DIR/test_$TESTS_TOTAL.log" 2>&1; then
+    # Run test and capture exit code
+    local test_exit_code=0
+    eval "$test_command" > "$TEST_OUTPUT_DIR/test_$TESTS_TOTAL.log" 2>&1 || test_exit_code=$?
+
+    # Always show log content for debugging (but only stderr goes to console)
+    echo "Test command: $test_command" >> "$TEST_OUTPUT_DIR/test_$TESTS_TOTAL.log"
+    echo "Exit code: $test_exit_code" >> "$TEST_OUTPUT_DIR/test_$TESTS_TOTAL.log"
+
+    if [ $test_exit_code -eq 0 ]; then
         if [ -n "$expected_output" ]; then
             if grep -q "$expected_output" "$TEST_OUTPUT_DIR/test_$TESTS_TOTAL.log"; then
                 echo -e "${GREEN}  ✓ PASSED${NC}"
@@ -50,6 +58,9 @@ run_test() {
                 return 0
             else
                 echo -e "${RED}  ✗ FAILED - Expected output not found${NC}"
+                echo "Expected: $expected_output"
+                echo "Log file: $TEST_OUTPUT_DIR/test_$TESTS_TOTAL.log"
+                cat "$TEST_OUTPUT_DIR/test_$TESTS_TOTAL.log"
                 TESTS_FAILED=$((TESTS_FAILED + 1))
                 return 1
             fi
@@ -59,7 +70,9 @@ run_test() {
             return 0
         fi
     else
-        echo -e "${RED}  ✗ FAILED - Command failed${NC}"
+        echo -e "${RED}  ✗ FAILED - Command failed (exit code: $test_exit_code)${NC}"
+        echo "Command: $test_command"
+        echo "Log file: $TEST_OUTPUT_DIR/test_$TESTS_TOTAL.log"
         cat "$TEST_OUTPUT_DIR/test_$TESTS_TOTAL.log"
         TESTS_FAILED=$((TESTS_FAILED + 1))
         return 1
@@ -70,9 +83,37 @@ run_test() {
 check_no_match() {
     local pattern=$1
     local file=$2
-    if grep -E "$pattern" "$file" > /dev/null 2>&1; then
+
+    echo "=== Diagnostic Info ===" >&2
+    echo "Pattern: $pattern" >&2
+    echo "File: $file" >&2
+    echo "File exists: $(test -f "$file" && echo "yes" || echo "no")" >&2
+    echo "File readable: $(test -r "$file" && echo "yes" || echo "no")" >&2
+    echo "Working directory: $(pwd)" >&2
+    echo "Bash version: $BASH_VERSION" >&2
+    echo "Shell: $SHELL" >&2
+    echo "" >&2
+
+    # Try the grep and capture output
+    local grep_output
+    local grep_exit_code
+    grep_output=$(grep -E "$pattern" "$file" 2>&1) || grep_exit_code=$?
+
+    echo "Grep exit code: ${grep_exit_code:-0}" >&2
+    echo "Grep output length: ${#grep_output}" >&2
+    if [ -n "$grep_output" ]; then
+        echo "Grep found matches (first 200 chars):" >&2
+        echo "${grep_output:0:200}" >&2
+    else
+        echo "Grep output: (empty - no matches)" >&2
+    fi
+    echo "===================" >&2
+
+    if [ "${grep_exit_code:-0}" -eq 0 ]; then
+        echo "FAIL: Pattern found in file" >&2
         return 1  # Pattern found - test fails
     else
+        echo "PASS: Pattern not found in file" >&2
         return 0  # Pattern not found - test passes
     fi
 }
