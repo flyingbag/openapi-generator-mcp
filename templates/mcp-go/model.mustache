@@ -1,0 +1,18 @@
+{{>partial_header}}
+package {{packageName}}
+
+{{#models}}
+{{#model}}
+{{#description}}
+// {{classname}} - {{{.}}}
+{{/description}}
+type {{classname}} struct {
+{{#vars}}
+{{#description}}
+	// {{.}}
+{{/description}}
+	{{name}} {{dataType}} `json:"{{baseName}}{{^required}},omitempty{{/required}}"{{#isEnum}} enum:"{{#allowableValues}}{{#enumVars}}{{value}}{{^-last}},{{/-last}}{{/enumVars}}{{/allowableValues}}"{{/isEnum}}`
+{{/vars}}
+}
+{{/model}}
+{{/models}}

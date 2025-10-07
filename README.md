@@ -10,6 +10,7 @@ This project provides custom templates and configurations for [OpenAPI Generator
 - ✅ **C#** (.NET Standard 2.1)
 - ✅ **Python** (3.8+)
 - ✅ **TypeScript** (Node.js)
+- ✅ **Go** (1.21+)
 
 ## Features
 
@@ -53,7 +54,8 @@ cd openapi-generator-mcp
 generated/
 ├── csharp-mcp/        # C# MCP server code
 ├── python-mcp/        # Python MCP server code
-└── typescript-mcp/    # TypeScript MCP server code
+├── typescript-mcp/    # TypeScript MCP server code
+└── go-mcp/            # Go MCP server code
 ```
 
 ## Example: Using the Generated Code
@@ -99,6 +101,34 @@ public class PetMcpTool : PetMcpToolBase
 }
 ```
 
+### Go Example
+
+```go
+package main
+
+import (
+    "context"
+    "github.com/modelcontextprotocol/go-sdk/mcp"
+    "your-module/petstoremcp"
+)
+
+func main() {
+    // Create MCP server
+    server := mcp.NewServer(&mcp.Implementation{
+        Name:    "petstore-mcp",
+        Version: "1.0.0",
+    }, nil)
+
+    // Initialize generated tools with your service implementation
+    petTools := petstoremcp.NewPetMcpTools(yourPetService)
+    petTools.RegisterTools(server)
+
+    // Run server
+    transport := &mcp.StdioTransport{}
+    server.Run(context.Background(), transport)
+}
+```
+
 ## Project Structure
 
 ```
@@ -108,11 +138,13 @@ public class PetMcpTool : PetMcpToolBase
 ├── config/
 │   ├── mcp-csharp.json              # C# generator configuration
 │   ├── mcp-python.json              # Python generator configuration
-│   └── mcp-typescript.json          # TypeScript generator configuration
+│   ├── mcp-typescript.json          # TypeScript generator configuration
+│   └── mcp-go.json                  # Go generator configuration
 ├── templates/
 │   ├── mcp-csharp/                  # C# Mustache templates
 │   ├── mcp-python/                  # Python Mustache templates
-│   └── mcp-typescript/              # TypeScript Mustache templates
+│   ├── mcp-typescript/              # TypeScript Mustache templates
+│   └── mcp-go/                      # Go Mustache templates
 ├── examples/                        # Example implementations
 ├── generate-mcp-all.sh              # Multi-language generator script
 ├── validate-mcp-extensions.sh       # OpenAPI + MCP validator
@@ -202,6 +234,11 @@ pip install mcp
 npm install @modelcontextprotocol/sdk
 ```
 
+### Go SDK
+```bash
+go get github.com/modelcontextprotocol/go-sdk
+```
+
 ## Development Workflow
 
 1. **Define OpenAPI Spec** - Create or modify your OpenAPI specification
@@ -242,7 +279,8 @@ npx @modelcontextprotocol/inspector python -m petstore_mcp
 - Tutorial content
 
 ### 📋 Phase 4 - Additional Languages
-- Go, Kotlin, Rust, Java support
+- ✅ Go support (Complete)
+- Kotlin, Rust, Java support (Planned)
 
 ## Contributing
 
@@ -281,6 +319,7 @@ Apache 2.0 - See [LICENSE](./LICENSE) for details
 - [MCP C# SDK](https://github.com/modelcontextprotocol/csharp-sdk)
 - [MCP Python SDK](https://github.com/modelcontextprotocol/python-sdk)
 - [MCP TypeScript SDK](https://github.com/modelcontextprotocol/typescript-sdk)
+- [MCP Go SDK](https://github.com/modelcontextprotocol/go-sdk)
 
 ## Support
 

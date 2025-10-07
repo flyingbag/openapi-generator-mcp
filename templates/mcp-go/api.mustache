@@ -1,0 +1,90 @@
+{{>partial_header}}
+package {{packageName}}
+
+import (
+	"context"
+	"encoding/json"
+	"fmt"
+
+	"github.com/modelcontextprotocol/go-sdk/mcp"
+)
+
+{{#operations}}
+// {{classname}}McpTools provides MCP tools for {{baseName}} operations
+type {{classname}}McpTools struct {
+{{^isLibrary}}
+	service {{classname}}Service
+{{/isLibrary}}
+}
+
+{{^isLibrary}}
+// {{classname}}Service defines the interface for business logic implementation
+type {{classname}}Service interface {
+{{#operation}}
+	{{operationId}}(ctx context.Context{{#allParams}}, {{paramName}} {{dataType}}{{/allParams}}) ({{#returnType}}{{returnType}}, {{/returnType}}error)
+{{/operation}}
+}
+
+// New{{classname}}McpTools creates a new instance with the provided service implementation
+func New{{classname}}McpTools(service {{classname}}Service) *{{classname}}McpTools {
+	return &{{classname}}McpTools{
+		service: service,
+	}
+}
+{{/isLibrary}}
+// New{{classname}}McpTools creates a new instance
+func New{{classname}}McpTools() *{{classname}}McpTools {
+	return &{{classname}}McpTools{}
+}
+
+// RegisterTools registers all MCP tools with the server
+func (t *{{classname}}McpTools) RegisterTools(server *mcp.Server) {
+{{#operation}}
+	// Register {{operationId}} tool
+	mcp.AddTool(server, &mcp.Tool{
+		Name:        "{{operationId}}",
+		Description: "{{{notes}}}",
+	}, t.{{operationId}}Handler)
+{{/operation}}
+}
+
+{{#operation}}
+// {{operationId}}Input defines the input schema for {{operationId}}
+type {{operationId}}Input struct {
+{{#allParams}}
+	{{#lambda.titlecase}}{{paramName}}{{/lambda.titlecase}} {{dataType}} `json:"{{paramName}}"{{#description}} description:"{{{.}}}"{{/description}}`
+{{/allParams}}
+}
+
+{{#returnType}}
+// {{operationId}}Output defines the output schema for {{operationId}}
+type {{operationId}}Output struct {
+	Result {{returnType}} `json:"result"`
+}
+{{/returnType}}
+
+// {{operationId}}Handler is the MCP tool handler for {{operationId}}
+// {{summary}}
+{{#notes}}
+// {{.}}
+{{/notes}}
+func (t *{{classname}}McpTools) {{operationId}}Handler(
+	ctx context.Context,
+	req *mcp.CallToolRequest,
+	input {{operationId}}Input,
+) (*mcp.CallToolResult, {{#returnType}}{{operationId}}Output{{/returnType}}{{^returnType}}struct{}{{/returnType}}, error) {
+	// TODO: Implement {{operationId}}
+	return nil, {{#returnType}}{{operationId}}Output{}{{/returnType}}{{^returnType}}struct{}{}{{/returnType}}, fmt.Errorf("{{operationId}} not implemented")
+}
+
+{{/operation}}
+{{/operations}}
+
+// formatJSON converts a value to formatted JSON string
+func formatJSON(v interface{}) string {
+	data, err := json.MarshalIndent(v, "", "  ")
+	if err != nil {
+		return fmt.Sprintf(`{"error": "Failed to serialize response: %s"}`, err)
+	}
+	return string(data)
+}

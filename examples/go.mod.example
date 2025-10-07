@@ -1,0 +1,10 @@
+module example-petstore-mcp
+
+go 1.21
+
+require (
+	github.com/modelcontextprotocol/go-sdk v0.1.0
+)
+
+// In a real project, you would also include your generated package:
+// replace your-module/petstoremcp => ../generated/go-mcp

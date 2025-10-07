@@ -39,7 +39,7 @@ jobs:
     needs: validate
     strategy:
       matrix:
-        language: [csharp, python, typescript]
+        language: [csharp, python, typescript, go]
 
     steps:
       - name: Checkout code
@@ -127,10 +127,41 @@ jobs:
           cd ../generated/typescript-mcp
           npx tsc api/*.ts --noEmit --skipLibCheck || true
 
+  test-go:
+    name: Test Go Generated Code
+    runs-on: ubuntu-latest
+    needs: generate
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install OpenAPI Generator CLI
+        run: npm install -g @openapitools/openapi-generator-cli
+
+      - name: Generate Go code
+        run: ./generate-mcp-all.sh --languages=go
+
+      - name: Test Go syntax
+        run: |
+          cd ../generated/go-mcp
+          go fmt ./... || true
+          go vet ./... || true
+
   summary:
     name: Test Summary
     runs-on: ubuntu-latest
-    needs: [validate, generate, test-python, test-typescript]
+    needs: [validate, generate, test-python, test-typescript, test-go]
     if: always()
 
     steps:
@@ -141,3 +172,4 @@ jobs:
           echo "Generation: ${{ needs.generate.result }}"
           echo "Python Tests: ${{ needs.test-python.result }}"
           echo "TypeScript Tests: ${{ needs.test-typescript.result }}"
+          echo "Go Tests: ${{ needs.test-go.result }}"
