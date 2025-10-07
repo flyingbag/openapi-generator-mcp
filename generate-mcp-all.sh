@@ -13,7 +13,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
 
 # Default languages
-DEFAULT_LANGUAGES="csharp,python,typescript,go"
+DEFAULT_LANGUAGES="csharp,python,typescript,go,java"
 
 # Parse arguments
 LANGUAGES="${1:-$DEFAULT_LANGUAGES}"
@@ -39,8 +39,8 @@ while [[ $# -gt 0 ]]; do
             echo "Usage: $0 [OPTIONS]"
             echo ""
             echo "Options:"
-            echo "  --languages=LANGS    Comma-separated list of languages (default: csharp,python,typescript)"
-            echo "                       Available: csharp, python, typescript, go"
+            echo "  --languages=LANGS    Comma-separated list of languages (default: csharp,python,typescript,go,java)"
+            echo "                       Available: csharp, python, typescript, go, java"
             echo "  --dry-run           Show what would be generated without generating"
             echo "  --skip-post-process Skip post-processing steps"
             echo "  --help              Show this help message"
@@ -119,6 +119,10 @@ post_process_language() {
             # Go post-processing (if needed in future)
             echo -e "${YELLOW}No post-processing needed for Go${NC}"
             ;;
+        java)
+            # Java post-processing (if needed in future)
+            echo -e "${YELLOW}No post-processing needed for Java${NC}"
+            ;;
     esac
 }
 
@@ -170,6 +174,9 @@ for lang in "${LANG_ARRAY[@]}"; do
             ;;
         go)
             echo "  Go: ../generated/go-mcp/"
+            ;;
+        java)
+            echo "  Java: ../generated/java-mcp/"
             ;;
     esac
 done

@@ -138,6 +138,10 @@ run_test "Go templates exist" \
     "test -f templates/mcp-go/api.mustache && test -f templates/mcp-go/model.mustache" \
     ""
 
+run_test "Java templates exist" \
+    "test -f templates/mcp-java/api.mustache && test -f templates/mcp-java/model.mustache" \
+    ""
+
 echo ""
 echo -e "${BLUE}=== Configuration Validation Tests ===${NC}"
 echo ""
@@ -157,6 +161,10 @@ run_test "TypeScript config is valid JSON" \
 
 run_test "Go config is valid JSON" \
     "python3 -c \"import json; json.load(open('config/mcp-go.json'))\"" \
+    ""
+
+run_test "Java config is valid JSON" \
+    "python3 -c \"import json; json.load(open('config/mcp-java.json'))\"" \
     ""
 
 echo ""
@@ -210,6 +218,10 @@ run_test "Go template has no unclosed mustache tags" \
     "check_no_match '{{[^}]*\\\$' templates/mcp-go/api.mustache" \
     ""
 
+run_test "Java template has no unclosed mustache tags" \
+    "check_no_match '{{[^}]*\\\$' templates/mcp-java/api.mustache" \
+    ""
+
 echo ""
 echo -e "${BLUE}=== Documentation Tests ===${NC}"
 echo ""
@@ -248,8 +260,12 @@ run_test "Go generation dry-run" \
     "./generate-mcp-all.sh --languages=go --dry-run" \
     "Would run"
 
+run_test "Java generation dry-run" \
+    "./generate-mcp-all.sh --languages=java --dry-run" \
+    "Would run"
+
 run_test "Multi-language generation dry-run" \
-    "./generate-mcp-all.sh --languages=csharp,python,typescript,go --dry-run" \
+    "./generate-mcp-all.sh --languages=csharp,python,typescript,go,java --dry-run" \
     "Would run"
 
 echo ""

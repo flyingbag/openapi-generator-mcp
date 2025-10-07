@@ -1,0 +1,24 @@
+{
+  "inputSpec": "api/openapi.yaml",
+  "generatorName": "java",
+  "templateDir": "templates/mcp-java",
+  "outputDir": "../generated/java-mcp",
+  "excludeTests": "true",
+  "isLibrary": true,
+  "groupId": "io.github.openapi.mcp",
+  "artifactId": "petstore-mcp",
+  "artifactVersion": "1.0.0",
+  "apiPackage": "io.github.openapi.mcp.api",
+  "modelPackage": "io.github.openapi.mcp.model",
+  "invokerPackage": "io.github.openapi.mcp",
+  "library": "native",
+  "additionalProperties": {
+    "java8": "false",
+    "java11": "false",
+    "dateLibrary": "java8",
+    "useBeanValidation": "true",
+    "useJakartaEe": "true",
+    "hideGenerationTimestamp": "true",
+    "serializableModel": "true"
+  }
+}

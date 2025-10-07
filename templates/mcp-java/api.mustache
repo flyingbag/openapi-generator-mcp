@@ -1,0 +1,70 @@
+{{>licenseInfo}}
+package {{package}};
+
+{{#imports}}import {{import}};
+{{/imports}}
+
+import org.springframework.stereotype.Service;
+import org.springframework.ai.mcp.spec.McpSchema;
+import org.springframework.ai.mcp.spring.ToolCallbacks;
+import org.springframework.ai.mcp.spring.Tool;
+
+import java.util.List;
+import java.util.Map;
+
+{{#operations}}
+/**
+ * {{classname}} MCP Tools
+ * {{#description}}{{.}}{{/description}}{{^description}}MCP Tools for {{baseName}} operations{{/description}}
+ */
+@Service
+public class {{classname}}McpTools{{#isLibrary}}Base{{/isLibrary}} {
+{{#operation}}
+
+    /**
+     * {{summary}}
+     {{#notes}}
+     * {{.}}
+     {{/notes}}
+     {{#allParams}}
+     * @param {{paramName}} {{description}}
+     {{/allParams}}
+     {{#returnType}}
+     * @return {{.}}
+     {{/returnType}}
+     */
+    @Tool(
+        name = "{{operationId}}",
+        description = "{{{notes}}}"{{#hasRequiredParams}},
+        inputSchema = @McpSchema.Builder(
+            type = "object",
+            properties = {
+                {{#allParams}}
+                @McpSchema.PropertyBuilder(
+                    name = "{{paramName}}",
+                    type = "{{#isString}}string{{/isString}}{{#isInteger}}integer{{/isInteger}}{{#isLong}}integer{{/isLong}}{{#isFloat}}number{{/isFloat}}{{#isDouble}}number{{/isDouble}}{{#isBoolean}}boolean{{/isBoolean}}{{#isArray}}array{{/isArray}}{{#isMap}}object{{/isMap}}",
+                    description = "{{{description}}}"{{#required}},
+                    required = true{{/required}}
+                ){{^-last}},{{/-last}}
+                {{/allParams}}
+            }{{#hasRequiredParams}},
+            required = {
+                {{#allParams}}{{#required}}"{{paramName}}"{{^-last}}, {{/-last}}{{/required}}{{/allParams}}
+            }{{/hasRequiredParams}}
+        ){{/hasRequiredParams}}
+    )
+    public {{#returnType}}{{{.}}}{{/returnType}}{{^returnType}}void{{/returnType}} {{operationId}}({{#allParams}}{{^isBodyParam}}{{{dataType}}} {{paramName}}{{/isBodyParam}}{{#isBodyParam}}{{{dataType}}} {{paramName}}{{/isBodyParam}}{{^-last}}, {{/-last}}{{/allParams}}) {
+        {{#isLibrary}}
+        // TODO: Implement {{operationId}}
+        throw new UnsupportedOperationException("{{operationId}} not implemented");
+        {{/isLibrary}}
+        {{^isLibrary}}
+        // TODO: Implement your business logic here
+        {{#returnType}}
+        return null;
+        {{/returnType}}
+        {{/isLibrary}}
+    }
+{{/operation}}
+}
+{{/operations}}

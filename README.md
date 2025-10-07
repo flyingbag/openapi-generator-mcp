@@ -11,6 +11,7 @@ This project provides custom templates and configurations for [OpenAPI Generator
 - ✅ **Python** (3.8+)
 - ✅ **TypeScript** (Node.js)
 - ✅ **Go** (1.21+)
+- ✅ **Java** (17+, Spring AI)
 
 ## Features
 
@@ -55,7 +56,8 @@ generated/
 ├── csharp-mcp/        # C# MCP server code
 ├── python-mcp/        # Python MCP server code
 ├── typescript-mcp/    # TypeScript MCP server code
-└── go-mcp/            # Go MCP server code
+├── go-mcp/            # Go MCP server code
+└── java-mcp/          # Java MCP server code
 ```
 
 ## Example: Using the Generated Code
@@ -129,6 +131,33 @@ func main() {
 }
 ```
 
+### Java Example
+
+```java
+@SpringBootApplication
+public class PetstoreMcpApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(PetstoreMcpApplication.class, args);
+    }
+
+    @Bean
+    public List<ToolCallback> mcpTools(PetAPIMcpTools petTools) {
+        return List.of(ToolCallbacks.from(petTools));
+    }
+}
+
+// Generated tool class with @Tool annotations
+@Service
+public class PetAPIMcpTools {
+    @Tool(name = "getPetById", description = "Returns a single pet")
+    public Pet getPetById(Long petId) {
+        // Implement your business logic
+        return petService.findById(petId);
+    }
+}
+```
+
 ## Project Structure
 
 ```
@@ -139,12 +168,14 @@ func main() {
 │   ├── mcp-csharp.json              # C# generator configuration
 │   ├── mcp-python.json              # Python generator configuration
 │   ├── mcp-typescript.json          # TypeScript generator configuration
-│   └── mcp-go.json                  # Go generator configuration
+│   ├── mcp-go.json                  # Go generator configuration
+│   └── mcp-java.json                # Java generator configuration
 ├── templates/
 │   ├── mcp-csharp/                  # C# Mustache templates
 │   ├── mcp-python/                  # Python Mustache templates
 │   ├── mcp-typescript/              # TypeScript Mustache templates
-│   └── mcp-go/                      # Go Mustache templates
+│   ├── mcp-go/                      # Go Mustache templates
+│   └── mcp-java/                    # Java Mustache templates
 ├── examples/                        # Example implementations
 ├── generate-mcp-all.sh              # Multi-language generator script
 ├── validate-mcp-extensions.sh       # OpenAPI + MCP validator
@@ -239,6 +270,15 @@ npm install @modelcontextprotocol/sdk
 go get github.com/modelcontextprotocol/go-sdk
 ```
 
+### Java SDK
+```xml
+<dependency>
+    <groupId>org.springframework.ai</groupId>
+    <artifactId>spring-ai-mcp-spring</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+</dependency>
+```
+
 ## Development Workflow
 
 1. **Define OpenAPI Spec** - Create or modify your OpenAPI specification
@@ -280,7 +320,8 @@ npx @modelcontextprotocol/inspector python -m petstore_mcp
 
 ### 📋 Phase 4 - Additional Languages
 - ✅ Go support (Complete)
-- Kotlin, Rust, Java support (Planned)
+- ✅ Java support (Complete)
+- Kotlin, Rust support (Planned)
 
 ## Contributing
 
@@ -320,6 +361,7 @@ Apache 2.0 - See [LICENSE](./LICENSE) for details
 - [MCP Python SDK](https://github.com/modelcontextprotocol/python-sdk)
 - [MCP TypeScript SDK](https://github.com/modelcontextprotocol/typescript-sdk)
 - [MCP Go SDK](https://github.com/modelcontextprotocol/go-sdk)
+- [MCP Java SDK](https://github.com/modelcontextprotocol/java-sdk)
 
 ## Support
 

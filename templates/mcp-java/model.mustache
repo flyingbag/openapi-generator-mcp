@@ -1,0 +1,153 @@
+{{>licenseInfo}}
+package {{package}};
+
+{{#imports}}import {{import}};
+{{/imports}}
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+{{#withXml}}
+import javax.xml.bind.annotation.*;
+{{/withXml}}
+{{#useJakartaEe}}
+import jakarta.validation.constraints.*;
+import jakarta.validation.Valid;
+{{/useJakartaEe}}
+{{^useJakartaEe}}
+{{#jakarta}}
+import jakarta.validation.constraints.*;
+import jakarta.validation.Valid;
+{{/jakarta}}
+{{^jakarta}}
+{{#useBeanValidation}}
+import javax.validation.constraints.*;
+import javax.validation.Valid;
+{{/useBeanValidation}}
+{{/jakarta}}
+{{/useJakartaEe}}
+
+{{#models}}
+{{#model}}
+{{#isEnum}}
+/**
+ * {{description}}
+ */
+public enum {{classname}} {
+{{#allowableValues}}
+{{#enumVars}}
+  {{#vendorExtensions.x-upper-case-enum-names}}{{name}}{{/vendorExtensions.x-upper-case-enum-names}}{{^vendorExtensions.x-upper-case-enum-names}}{{name}}{{/vendorExtensions.x-upper-case-enum-names}}({{{value}}}){{^-last}},
+  {{/-last}}{{#-last}};{{/-last}}
+{{/enumVars}}
+{{/allowableValues}}
+
+  private {{{dataType}}} value;
+
+  {{classname}}({{{dataType}}} value) {
+    this.value = value;
+  }
+
+  @JsonProperty
+  public {{{dataType}}} getValue() {
+    return value;
+  }
+
+  @Override
+  public String toString() {
+    return String.valueOf(value);
+  }
+}
+{{/isEnum}}
+{{^isEnum}}
+/**
+ * {{description}}
+ */
+{{#withXml}}
+@XmlRootElement(name = "{{xmlName}}")
+@XmlAccessorType(XmlAccessType.FIELD)
+{{/withXml}}
+public class {{classname}} {{#parent}}extends {{{.}}}{{/parent}} {
+{{#vars}}
+{{#isEnum}}
+{{^isContainer}}
+{{>modelInnerEnum}}
+{{/isContainer}}
+{{/isEnum}}
+  @JsonProperty("{{baseName}}")
+{{#withXml}}
+  @XmlElement(name = "{{xmlName}}")
+{{/withXml}}
+  private {{{datatypeWithEnum}}} {{name}}{{#defaultValue}} = {{{.}}}{{/defaultValue}};
+
+{{/vars}}
+{{#vars}}
+  /**
+   * {{description}}
+   {{#minimum}}
+   * minimum: {{.}}
+   {{/minimum}}
+   {{#maximum}}
+   * maximum: {{.}}
+   {{/maximum}}
+   * @return {{name}}
+   */
+{{#vendorExtensions.x-extra-annotation}}
+  {{{vendorExtensions.x-extra-annotation}}}
+{{/vendorExtensions.x-extra-annotation}}
+{{#useBeanValidation}}
+{{#isModel}}
+  @Valid
+{{/isModel}}
+{{#required}}
+  @NotNull
+{{/required}}
+{{#minLength}}
+  @Size(min={{.}}{{#maxLength}}, max={{.}}{{/maxLength}})
+{{/minLength}}
+{{#maxLength}}
+{{^minLength}}
+  @Size(max={{.}})
+{{/minLength}}
+{{/maxLength}}
+{{#minimum}}
+  @Min({{.}})
+{{/minimum}}
+{{#maximum}}
+  @Max({{.}})
+{{/maximum}}
+{{#pattern}}
+  @Pattern(regexp="{{.}}")
+{{/pattern}}
+{{/useBeanValidation}}
+  public {{{datatypeWithEnum}}} {{getter}}() {
+    return {{name}};
+  }
+
+  public void {{setter}}({{{datatypeWithEnum}}} {{name}}) {
+    this.{{name}} = {{name}};
+  }
+
+{{/vars}}
+
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    sb.append("class {{classname}} {\n");
+    {{#parent}}
+    sb.append("    ").append(toIndentedString(super.toString())).append("\n");
+    {{/parent}}
+    {{#vars}}
+    sb.append("    {{name}}: ").append(toIndentedString({{name}})).append("\n");
+    {{/vars}}
+    sb.append("}");
+    return sb.toString();
+  }
+
+  private String toIndentedString(Object o) {
+    if (o == null) {
+      return "null";
+    }
+    return o.toString().replace("\n", "\n    ");
+  }
+}
+{{/isEnum}}
+{{/model}}
+{{/models}}
